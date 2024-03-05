@@ -5,8 +5,11 @@ export default (): AppConfig => ({
     salesCheckCron: process.env.SALES_CHECK_CRON || '*/1 * * * *',
     salesLookbackSeconds: Number(process.env.SALES_LOOKBACK) || 900,
     redisUri: process.env.REDIS_URL || 'redis://localhost:6379',
-    reservoirApiMainnet: 'https://forgotten.market/api/sales/v6',
-    reservoirApiArbitrum: 'https://api-arbitrum.reservoir.tools/sales/v6', // TODO: switch to our paid version?
+    reservoirSalesApiMainnet: 'https://forgotten.market/api/sales/v6',
+    reservoirSalesApiArbitrum: 'https://api-arbitrum.reservoir.tools/sales/v6', // TODO: switch to our paid version?
+    reservoirAsksApiMainnet: 'https://forgotten.market/api/orders/asks/v5',
+    reservoirAsksApiArbitrum:
+      'https://api-arbitrum.reservoir.tools/orders/asks/v5',
     forgottenBaseURI: 'https://forgotten.market',
   },
   wizard: {
@@ -75,13 +78,6 @@ export default (): AppConfig => ({
     dataURI: 'http://forgottenbabies.com/uri/json',
     imageURI: 'http://forgottenbabies.com/uri/json',
   },
-  treats: {
-    tokenContract: '0x7c104b4db94494688027cced1e2ebfb89642c80f',
-    tokenAbi: 'abis/treats.json',
-    forgottenSlug: 'athenaeum',
-    dataURI: 'https://portal.forgottenrunes.com/api/treats/data/',
-    imageURI: 'https://portal.forgottenrunes.com/api/treats/img/',
-  },
   tricks: {
     tokenContract: '0x881731d0b01db270379389ba5234326d8d16a124',
     tokenAbi: 'abis/tricks.json',
@@ -107,11 +103,16 @@ export default (): AppConfig => ({
   },
   athenaeum: {
     tokenContract: '0x7c104b4db94494688027cced1e2ebfb89642c80f',
+    tokenAbi: 'abis/treats.json',
     forgottenSlug: 'athenaeum',
+    dataURI: 'https://portal.forgottenrunes.com/api/treats/data/',
+    imageURI: 'https://portal.forgottenrunes.com/api/treats/img/',
   },
   discord: {
     token: process.env.DISCORD_BOT_TOKEN,
     salesChannelIds: process.env.DISCORD_SALES_CHANNEL_IDS.split(',') || [],
+    listingsChannelIds:
+      process.env.DISCORD_LISTINGS_CHANNEL_IDS.split(',') || [],
     prefix: process.env.DISCORD_PREFIX || '#',
   },
   ethereum: {

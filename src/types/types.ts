@@ -81,6 +81,26 @@ export interface Pony {
 }
 
 /**
+ * Ring
+ */
+export interface Ring {
+  name: string;
+  serial: string;
+  traits: any[];
+  backgroundColor: string;
+}
+
+/**
+ * Athenaeum
+ */
+export interface Athenaeum {
+  name: string;
+  serial: string;
+  traits: any[];
+  backgroundColor: string;
+}
+
+/**
  * Pony Attribute names
  */
 export enum PonyAttrName {
@@ -154,6 +174,16 @@ export interface Warrior {
 }
 
 /**
+ * InfinityVeil
+ */
+export interface InfinityVeil {
+  name: string;
+  serial: string;
+  traits: any[];
+  backgroundColor: string;
+}
+
+/**
  * Soul Attribute names
  */
 export enum WarriorAttrName {
@@ -181,7 +211,17 @@ export interface Trait {
 /**
  * Item
  */
-export type Item = Wizard | Warrior | Soul | Pony | Lock | Beast | Spawn;
+export type Item =
+  | Wizard
+  | Warrior
+  | Soul
+  | Pony
+  | Lock
+  | Beast
+  | Spawn
+  | Ring
+  | InfinityVeil
+  | Athenaeum;
 
 export interface RarityConfig {
   color: string;
@@ -273,6 +313,25 @@ export interface Sale {
   market: string;
   marketIcon: string;
   creatorRoyalties?: string;
+}
+
+/**
+ * Listing type
+ */
+export interface Listing {
+  id: string;
+  title: string;
+  tokenSymbol: string;
+  tokenPrice: number;
+  usdPrice?: string;
+  sellerAddr: string;
+  sellerName?: string;
+  permalink: string;
+  thumbnail: string;
+  backgroundColor: string;
+  cacheKey: string;
+  market: string;
+  marketIcon: string;
 }
 
 export enum Market {
