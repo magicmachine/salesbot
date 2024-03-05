@@ -78,13 +78,6 @@ export default (): AppConfig => ({
     dataURI: 'http://forgottenbabies.com/uri/json',
     imageURI: 'http://forgottenbabies.com/uri/json',
   },
-  treats: {
-    tokenContract: '0x7c104b4db94494688027cced1e2ebfb89642c80f',
-    tokenAbi: 'abis/treats.json',
-    forgottenSlug: 'athenaeum',
-    dataURI: 'https://portal.forgottenrunes.com/api/treats/data/',
-    imageURI: 'https://portal.forgottenrunes.com/api/treats/img/',
-  },
   tricks: {
     tokenContract: '0x881731d0b01db270379389ba5234326d8d16a124',
     tokenAbi: 'abis/tricks.json',
@@ -110,7 +103,10 @@ export default (): AppConfig => ({
   },
   athenaeum: {
     tokenContract: '0x7c104b4db94494688027cced1e2ebfb89642c80f',
+    tokenAbi: 'abis/treats.json',
     forgottenSlug: 'athenaeum',
+    dataURI: 'https://portal.forgottenrunes.com/api/treats/data/',
+    imageURI: 'https://portal.forgottenrunes.com/api/treats/img/',
   },
   discord: {
     token: process.env.DISCORD_BOT_TOKEN,

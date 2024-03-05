@@ -18,6 +18,8 @@ import {
   Trait,
   Item,
   InfinityVeil,
+  Ring,
+  Athenaeum,
 } from 'src/types';
 import { AppConfigService } from '../config';
 import { EmbedFieldData } from 'discord.js';
@@ -64,6 +66,12 @@ export class DataStoreService {
         return this.getSpawn(id);
       case this.configService.pony.tokenContract:
         return this.getPony(id);
+      case this.configService.rings.tokenContract:
+        return this.getRing(id);
+      case this.configService.athenaeum.tokenContract:
+        return this.getAthenaeum(id);
+      case this.configService.flame.tokenContract:
+        return this.getInfinityVeil(id);
     }
   }
 
@@ -291,6 +299,78 @@ export class DataStoreService {
       };
     } catch (err) {
       this._logger.error(err);
+    }
+  }
+
+  /**
+   * get Ring
+   */
+  public async getRing(id: string): Promise<Ring> {
+    try {
+      const url = `${this.configService.rings.dataURI}/${id}`;
+      const options = {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      };
+      const response = await fetch(url, options);
+      const json = await response.json();
+
+      return {
+        serial: id,
+        name: json.name,
+        backgroundColor: '000000',
+        traits: [],
+      };
+    } catch (err) {
+      this._logger.error('Error getting ring', err);
+    }
+  }
+
+  /**
+   * get Athenaeum
+   */
+  public async getAthenaeum(id: string): Promise<Athenaeum> {
+    try {
+      const url = `${this.configService.athenaeum.dataURI}/${id}`;
+      const options = {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      };
+      const response = await fetch(url, options);
+      const json = await response.json();
+
+      return {
+        serial: id,
+        name: json.name,
+        backgroundColor: '000000',
+        traits: [],
+      };
+    } catch (err) {
+      this._logger.error('Error getting athenaeum', err);
+    }
+  }
+
+  /**
+   * get Infinity Veil
+   */
+  public async getInfinityVeil(id: string): Promise<InfinityVeil> {
+    try {
+      const url = `${this.configService.flame.dataURI}/${id}`;
+      const options = {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+      };
+      const response = await fetch(url, options);
+      const json = await response.json();
+
+      return {
+        serial: id,
+        name: json.name,
+        backgroundColor: '000000',
+        traits: [],
+      };
+    } catch (err) {
+      this._logger.error('Error getting infinity veil', err);
     }
   }
 

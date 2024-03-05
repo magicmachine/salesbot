@@ -63,7 +63,6 @@ export class DiscordService {
    */
   public async postListings(listings: Listing[]): Promise<void> {
     for (const listing of listings) {
-      console.log('listing', listing);
       const embed = new MessageEmbed()
         .setColor(listing.backgroundColor)
         .setTitle(listing.title)

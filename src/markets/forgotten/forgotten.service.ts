@@ -237,18 +237,15 @@ export class ForgottenMarketService extends MarketService {
         listing.source.domain,
       );
       const [, , tokenId] = listing.tokenSetId.split(':');
-      const cacheKey = `${listing.txHash}:${listing.id}`;
-      const time =
-        Date.now() / 1000 - new Date(listing.updatedAt).getTime() / 1000;
+      const cacheKey = listing.id;
+      const time = (Date.now() - new Date(listing.updatedAt).getTime()) / 1000;
       if (time < this.configService.bot.salesLookbackSeconds) {
-        // check if sale already in broadcast
+        // check if already in broadcast
         if (await this.cacheService.isCached(cacheKey)) {
           continue;
         }
 
         const sellerName = await this.etherService.getDomain(listing.maker);
-
-        this._logger.log(`No name  in sale data, fetching individually`);
 
         const item: Item = await this.dataStoreService.getItemByContract(
           tokenId,

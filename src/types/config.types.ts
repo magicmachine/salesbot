@@ -16,7 +16,6 @@ export interface AppConfig {
   beast: CollectionConfig;
   spawn: CollectionConfig;
   babies: CollectionConfig;
-  treats: CollectionConfig;
   tricks: CollectionConfig;
   boxes: CollectionConfig;
   rings: CollectionConfig;
