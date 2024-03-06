@@ -7,7 +7,7 @@ import {
   MarketURI,
   Item,
   Listing,
-} from 'src/types';
+} from '../../types';
 import { MarketService } from '../market.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from '../../config';
@@ -205,7 +205,7 @@ export class ForgottenMarketService extends MarketService {
             cacheKey: cacheKey,
             permalink: `https://forgotten.market/${c.tokenContract}/${sale.token.tokenId}`,
             thumbnail,
-            backgroundColor: '000000',
+            backgroundColor: '#000000',
             market: market.name,
             marketIcon: market.icon,
             creatorRoyalties: (
@@ -281,7 +281,7 @@ export class ForgottenMarketService extends MarketService {
             cacheKey,
             permalink: `https://forgotten.market/${c.tokenContract}/${tokenId}`,
             thumbnail,
-            backgroundColor: '000000',
+            backgroundColor: '#000000',
             market: market.name,
             marketIcon: market.icon,
           });

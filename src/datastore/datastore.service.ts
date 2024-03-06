@@ -20,10 +20,10 @@ import {
   InfinityVeil,
   Ring,
   Athenaeum,
-} from 'src/types';
+} from '../types';
 import { AppConfigService } from '../config';
-import { EmbedFieldData } from 'discord.js';
 import wizardData from '../wizard-summary.json';
+import { APIEmbedField } from 'discord.js';
 
 @Injectable()
 export class DataStoreService {
@@ -82,11 +82,11 @@ export class DataStoreService {
     try {
       const wizardJson = wizardData.wizards[id],
         traits = [];
-      let color: string;
+      let color: `#${string}`;
       for (const trait in wizardJson.traits) {
         const [name, value] = wizardJson.traits[trait].split(': ', 2);
         if (name === 'background') {
-          color = WizardBackground[value];
+          color =`#${WizardBackground[value]}`;
         }
         traits.push({
           name: name.charAt(0).toUpperCase() + name.substring(1),
@@ -112,7 +112,7 @@ export class DataStoreService {
   /*
    * Get wizard fields for discord embed message
    */
-  public getWizardFields(wizard: Wizard): EmbedFieldData[] {
+  public getWizardFields(wizard: Wizard): APIEmbedField[] {
     const fields = [];
 
     // this is ugly
@@ -318,7 +318,7 @@ export class DataStoreService {
       return {
         serial: id,
         name: json.name,
-        backgroundColor: '000000',
+        backgroundColor: '#000000',
         traits: [],
       };
     } catch (err) {
@@ -342,7 +342,7 @@ export class DataStoreService {
       return {
         serial: id,
         name: json.name,
-        backgroundColor: '000000',
+        backgroundColor: '#000000',
         traits: [],
       };
     } catch (err) {
@@ -366,7 +366,7 @@ export class DataStoreService {
       return {
         serial: id,
         name: json.name,
-        backgroundColor: '000000',
+        backgroundColor: '#000000',
         traits: [],
       };
     } catch (err) {
@@ -440,7 +440,7 @@ export class DataStoreService {
         serial: id,
         name: json.name,
         traits: traits,
-        backgroundColor: '000000',
+        backgroundColor: '#000000',
       };
     } catch (err) {
       this._logger.error(err);
