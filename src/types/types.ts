@@ -326,7 +326,8 @@ export interface Listing {
   usdPrice?: string;
   sellerAddr: string;
   sellerName?: string;
-  permalink: string;
+  fmLink: string;
+  listingLink: string;
   thumbnail: string;
   backgroundColor: `#${string}`;
   cacheKey: string;
