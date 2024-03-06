@@ -74,10 +74,20 @@ export class DiscordService {
       const embed = new EmbedBuilder()
         .setColor(listing.backgroundColor)
         .setTitle(listing.title)
-        .setURL(listing.permalink)
+        .setURL(listing.fmLink)
         .setThumbnail(listing.thumbnail)
         .addFields(this.getListingFields(listing))
-        .setFooter({ text: listing.market, iconURL: listing.marketIcon });
+        .addFields([
+          {
+            name: 'Marketplace',
+            value: `[${listing.market}](${listing.listingLink})`,
+            inline: true,
+          },
+        ])
+        .setFooter({
+          text: ' ',
+          iconURL: listing.marketIcon,
+        });
 
       if (await this.cacheService.isCached(listing.cacheKey)) {
         break;
