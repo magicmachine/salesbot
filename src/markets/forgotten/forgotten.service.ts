@@ -269,10 +269,18 @@ export class ForgottenMarketService extends MarketService {
         const thumbnail = `${c.imageURI}/${tokenId}.png`;
 
         this._logger.log(`Listing: ${JSON.stringify(listing)}`);
+
+        const containsRoyalty = listing.feeBreakdown.some(
+          (fee: any) => fee.kind === 'royalty' && fee.bps > 0,
+        );
+
         try {
           listings.push({
             id: tokenId,
-            title: `${name} ${tokenId.length < 8 ? `(#${tokenId})` : ''}`,
+            title: `${name} ${tokenId.length < 8 ? `(#${tokenId})` : ''} ${
+              containsRoyalty ? '🟢' : '🔴'
+            }`,
+
             tokenSymbol: listing.price.currency.symbol,
             tokenPrice: listing.price.amount.native,
             usdPrice: `(${listing.price.amount.usd.toFixed(2)} USD)`,
