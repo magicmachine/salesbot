@@ -7,7 +7,7 @@ export interface Wizard {
   nameLength: number;
   traits: WizardTrait[] | any[];
   traitCount: number;
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
   maxAffinity: number;
   affinities: Record<string, unknown>;
 }
@@ -39,7 +39,7 @@ export interface Soul {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -77,7 +77,7 @@ export interface Pony {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -87,7 +87,7 @@ export interface Ring {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -97,7 +97,7 @@ export interface Athenaeum {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -120,7 +120,7 @@ export interface Lock {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -139,7 +139,7 @@ export interface Beast {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
   description: string;
 }
 
@@ -160,7 +160,7 @@ export interface Spawn {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -170,7 +170,7 @@ export interface Warrior {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -180,7 +180,7 @@ export interface InfinityVeil {
   name: string;
   serial: string;
   traits: any[];
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
 }
 
 /**
@@ -309,7 +309,7 @@ export interface Sale {
   cacheKey: string;
   permalink: string;
   thumbnail: string;
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
   market: string;
   marketIcon: string;
   creatorRoyalties?: string;
@@ -328,7 +328,7 @@ export interface Listing {
   sellerName?: string;
   permalink: string;
   thumbnail: string;
-  backgroundColor: string;
+  backgroundColor: `#${string}`;
   cacheKey: string;
   market: string;
   marketIcon: string;

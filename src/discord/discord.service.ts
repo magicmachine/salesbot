@@ -1,17 +1,25 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from '../config';
-import { EthereumService } from 'src/ethereum';
-import Discord, { TextChannel, MessageEmbed, EmbedFieldData } from 'discord.js';
+import { EthereumService } from '../ethereum';
+import {
+  TextChannel,
+  EmbedBuilder,
+  Client,
+  GatewayIntentBits,
+  APIEmbedField,
+} from 'discord.js';
 import toRegexRange from 'to-regex-range';
-import { CollectionConfig, Wizard, Sale, Item, Listing } from 'src/types';
-import { ForgottenMarketService } from 'src/markets';
+import { CollectionConfig, Wizard, Sale, Item, Listing } from '../types';
+import { ForgottenMarketService } from '../markets';
 import { DataStoreService } from '../datastore';
-import { CacheService } from 'src/cache';
+import { CacheService } from '../cache';
 
 @Injectable()
 export class DiscordService {
   private readonly _logger = new Logger(DiscordService.name);
-  private readonly _client = new Discord.Client();
+  private readonly _client = new Client({
+    intents: GatewayIntentBits.GuildMessages,
+  });
   private readonly _rangeRegex = new RegExp(`^${toRegexRange('0', '9999')}$`);
 
   protected _salesChannels: Array<TextChannel>;
@@ -63,13 +71,13 @@ export class DiscordService {
    */
   public async postListings(listings: Listing[]): Promise<void> {
     for (const listing of listings) {
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor(listing.backgroundColor)
         .setTitle(listing.title)
         .setURL(listing.permalink)
         .setThumbnail(listing.thumbnail)
         .addFields(this.getListingFields(listing))
-        .setFooter(listing.market, listing.marketIcon);
+        .setFooter({ text: listing.market, iconURL: listing.marketIcon });
 
       if (await this.cacheService.isCached(listing.cacheKey)) {
         break;
@@ -83,10 +91,10 @@ export class DiscordService {
   /**
    * Post Listing
    */
-  public async postListing(embed: MessageEmbed): Promise<void> {
+  public async postListing(embed: EmbedBuilder): Promise<void> {
     for (const channel of this._listingsChannels) {
       try {
-        await channel.send(embed);
+        await channel.send({ embeds: [embed] });
       } catch (err) {
         this._logger.error(err);
       }
@@ -105,10 +113,10 @@ export class DiscordService {
   /**
    * Post a sale
    */
-  public async postSale(embed: MessageEmbed): Promise<void> {
+  public async postSale(embed: EmbedBuilder): Promise<void> {
     for (const channel of this._salesChannels) {
       try {
-        await channel.send(embed);
+        await channel.send({ embeds: [embed] });
       } catch (err) {
         this._logger.error(err);
       }
@@ -121,13 +129,13 @@ export class DiscordService {
 
   public async postSales(sales: Sale[]): Promise<void> {
     for (const sale of sales) {
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor(sale.backgroundColor)
         .setTitle(sale.title)
         .setURL(sale.permalink)
         .setThumbnail(sale.thumbnail)
         .addFields(this.getSaleFields(sale))
-        .setFooter(sale.market, sale.marketIcon);
+        .setFooter({ text: sale.market, iconURL: sale.marketIcon });
 
       if (await this.cacheService.isCached(sale.cacheKey)) {
         break;
@@ -146,7 +154,7 @@ export class DiscordService {
     return [
       {
         name: 'Amount',
-        value: `${sale.tokenPrice.toFixed(2)} ${sale.tokenSymbol} ${
+        value: `${parseFloat(sale.tokenPrice.toFixed(4))} ${sale.tokenSymbol} ${
           sale.usdPrice
         }`,
         inline: false,
@@ -173,13 +181,13 @@ export class DiscordService {
     ];
   }
 
-  public getListingFields(listing: Listing): EmbedFieldData[] {
+  public getListingFields(listing: Listing): APIEmbedField[] {
     return [
       {
         name: 'Price',
-        value: `${listing.tokenPrice.toFixed(2)} ${listing.tokenSymbol} ${
-          listing.usdPrice
-        }`,
+        value: `${parseFloat(listing.tokenPrice.toFixed(4))} ${
+          listing.tokenSymbol
+        } ${listing.usdPrice}`,
         inline: false,
       },
       {
@@ -208,7 +216,7 @@ export class DiscordService {
       const id = args[0].toLowerCase();
 
       const collection = args[1];
-      let embed: MessageEmbed;
+      let embed: EmbedBuilder;
 
       switch (collection) {
         case 'pony':
@@ -279,17 +287,18 @@ export class DiscordService {
   public async sleep(ms: number): Promise<any> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  public async getEmbed(i: Item, c: CollectionConfig): Promise<MessageEmbed> {
+  public async getEmbed(i: Item, c: CollectionConfig): Promise<EmbedBuilder> {
     if (i === undefined) {
       return;
     }
-    return new MessageEmbed()
+    return new EmbedBuilder()
       .setColor(i.backgroundColor)
-      .setAuthor(
-        `${i.name} (#${i.serial})`,
-        'https://cdn.discordapp.com/app-icons/843121928549957683/af28e4f65099eadebbb0635b1ea8d0b2.png?size=64',
-        `${this.configService.bot.forgottenBaseURI}/${c.tokenContract}/${i.serial}`,
-      )
+      .setAuthor({
+        name: `${i.name} (#${i.serial})`,
+        iconURL:
+          'https://cdn.discordapp.com/app-icons/843121928549957683/af28e4f65099eadebbb0635b1ea8d0b2.png?size=64',
+        url: `${this.configService.bot.forgottenBaseURI}/${c.tokenContract}/${i.serial}`,
+      })
       .setURL(
         `${this.configService.bot.forgottenBaseURI}/${c.tokenContract}/${i.serial}`,
       )
