@@ -233,9 +233,6 @@ export class ForgottenMarketService extends MarketService {
   ): Promise<Listing[]> {
     const listings: Array<Listing> = [];
     for (const listing of forgottenListings) {
-      const market: MarketMetaData = await this.getMarketMetaData(
-        listing.source.domain,
-      );
       const [, , tokenId] = listing.tokenSetId.split(':');
       const cacheKey = listing.id;
       const time = (Date.now() - new Date(listing.updatedAt).getTime()) / 1000;
@@ -244,6 +241,10 @@ export class ForgottenMarketService extends MarketService {
         if (await this.cacheService.isCached(cacheKey)) {
           continue;
         }
+
+        const market: MarketMetaData = await this.getMarketMetaData(
+          listing.source.domain,
+        );
 
         const sellerName = await this.etherService.getDomain(listing.maker);
 
@@ -277,10 +278,8 @@ export class ForgottenMarketService extends MarketService {
         try {
           listings.push({
             id: tokenId,
-            title: `${name} ${tokenId.length < 8 ? `(#${tokenId})` : ''} ${
-              containsRoyalty ? '🟢' : '🔴'
-            }`,
-
+            title: `${name} ${tokenId.length < 8 ? `(#${tokenId})` : ''}`,
+            containsRoyalty,
             tokenSymbol: listing.price.currency.symbol,
             tokenPrice: listing.price.amount.native,
             usdPrice: `(${listing.price.amount.usd.toFixed(2)} USD)`,

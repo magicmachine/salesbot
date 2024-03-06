@@ -321,6 +321,7 @@ export interface Sale {
 export interface Listing {
   id: string;
   title: string;
+  containsRoyalty: boolean;
   tokenSymbol: string;
   tokenPrice: number;
   usdPrice?: string;

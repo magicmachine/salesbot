@@ -7,6 +7,7 @@ import {
   Client,
   GatewayIntentBits,
   APIEmbedField,
+  APIEmbed,
 } from 'discord.js';
 import toRegexRange from 'to-regex-range';
 import { CollectionConfig, Wizard, Sale, Item, Listing } from '../types';
@@ -70,29 +71,64 @@ export class DiscordService {
    * Post Listings
    */
   public async postListings(listings: Listing[]): Promise<void> {
-    for (const listing of listings) {
-      const embed = new EmbedBuilder()
-        .setColor(listing.backgroundColor)
-        .setTitle(listing.title)
-        .setURL(listing.fmLink)
-        .setThumbnail(listing.thumbnail)
-        .addFields(this.getListingFields(listing))
-        .addFields([
-          {
-            name: 'Marketplace',
-            value: `[${listing.market}](${listing.listingLink})`,
-            inline: true,
-          },
-        ])
-        .setFooter({
-          text: ' ',
-          iconURL: listing.marketIcon,
-        });
+    const groupedListingsMap: Record<string, Listing[]> = {};
+    listings.forEach(listing => {
+      if (groupedListingsMap[listing.id] == null) {
+        groupedListingsMap[listing.id] = [];
+      }
+      groupedListingsMap[listing.id].push(listing);
+    });
 
-      if (await this.cacheService.isCached(listing.cacheKey)) {
+    const groupedListings = Object.entries(groupedListingsMap);
+
+    for (const [, tokenListings] of groupedListings) {
+      const marketFields: APIEmbedField[] = tokenListings
+        .map(listing => {
+          return [
+            {
+              name: '\u000A',
+              value: '\u000A',
+            },
+            {
+              name: 'Marketplace',
+              value: `[${listing.market} ${
+                listing.containsRoyalty ? '👑' : ''
+              }](${listing.listingLink})`,
+              inline: true,
+            },
+            {
+              name: 'Price',
+              value: `${parseFloat(listing.tokenPrice.toFixed(4))} ${
+                listing.tokenSymbol
+              } ${listing.usdPrice}`,
+              inline: true,
+            },
+          ];
+        })
+        .flat();
+
+      const embed: APIEmbed = {
+        title: `${tokenListings[0].title}`,
+        url: tokenListings[0].fmLink,
+        thumbnail: {
+          url: tokenListings[0].thumbnail,
+        },
+        fields: [
+          {
+            name: 'From',
+            value: `[${listings[0].sellerAddr.slice(0, -34)}](${
+              this.configService.bot.forgottenBaseURI
+            }/address/${listings[0].sellerAddr}) ${listings[0].sellerName}`,
+            inline: false,
+          },
+          ...marketFields,
+        ],
+      };
+      const cacheKey = tokenListings.map(l => l.cacheKey).join(':');
+      if (await this.cacheService.isCached(cacheKey)) {
         break;
       } else {
-        await this.cacheService.cacheSale(listing.cacheKey);
+        await this.cacheService.cacheSale(cacheKey);
       }
       await this.postListing(embed);
     }
@@ -101,7 +137,7 @@ export class DiscordService {
   /**
    * Post Listing
    */
-  public async postListing(embed: EmbedBuilder): Promise<void> {
+  public async postListing(embed: APIEmbed): Promise<void> {
     for (const channel of this._listingsChannels) {
       try {
         await channel.send({ embeds: [embed] });
