@@ -124,12 +124,7 @@ export class DiscordService {
           ...marketFields,
         ],
       };
-      const cacheKey = tokenListings.map(l => l.cacheKey).join(':');
-      if (await this.cacheService.isCached(cacheKey)) {
-        break;
-      } else {
-        await this.cacheService.cacheSale(cacheKey);
-      }
+
       await this.postListing(embed);
     }
   }
