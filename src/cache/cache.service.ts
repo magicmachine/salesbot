@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from '../config';
 import { createClient } from 'redis';
 import { RedisClientType } from '@node-redis/client';
+import { Listing } from 'src/types';
 
 @Injectable()
 export class CacheService {
@@ -38,5 +39,22 @@ export class CacheService {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Cache listing
+   */
+  public async cacheListing(key: string, obj: Listing): Promise<void> {
+    this._logger.debug(`Caching listing ${key}`);
+    await this._cache.set(key, JSON.stringify(obj));
+  }
+
+  /**
+   * Get cache for listing
+   */
+  public async getCachedListing(key: string): Promise<Listing> {
+    this._logger.debug(`Getting Cache ${key}`);
+    const obj = await this._cache.get(key);
+    return JSON.parse(obj);
   }
 }

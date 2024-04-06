@@ -168,7 +168,7 @@ export class ForgottenMarketService extends MarketService {
           continue;
         }
 
-        name = name?.replace(/\(Item ID:.*\)$/, '');
+        name = this.getName(name);
 
         if (!thumbnail) {
           thumbnail = `${c.imageURI}/${sale.token.tokenId}.png`;
@@ -224,6 +224,25 @@ export class ForgottenMarketService extends MarketService {
     return sales.reverse();
   }
 
+  getName(name: string | undefined): string {
+    return name?.replace(/\(Item ID:.*\)$/, '');
+  }
+
+  shouldSkipListing(cachedListing: Listing, listing: Listing): boolean {
+    let skip = false;
+    if (cachedListing != null) {
+      const previousPrice = cachedListing.tokenPrice;
+      // exclude if price diff is less than 10%
+      if (
+        listing.tokenPrice <= previousPrice &&
+        listing.tokenPrice > 0.9 * previousPrice
+      ) {
+        skip = true;
+      }
+    }
+    return skip;
+  }
+
   /**
    *  Process json into Listing[] object
    */
@@ -234,20 +253,12 @@ export class ForgottenMarketService extends MarketService {
     const listings: Array<Listing> = [];
     for (const listing of forgottenListings) {
       const [, , tokenId] = listing.tokenSetId.split(':');
-      const cacheKey = listing.id;
+      const market = this.getMarketMetaData(listing.source.domain);
+      const cacheKey = `${listing.tokenSetId}:${market.name}`;
+
       const time = (Date.now() - new Date(listing.updatedAt).getTime()) / 1000;
       if (time < this.configService.bot.salesLookbackSeconds) {
-        // check if already in broadcast
-        if (await this.cacheService.isCached(cacheKey)) {
-          continue;
-        }
-
-        const market: MarketMetaData = await this.getMarketMetaData(
-          listing.source.domain,
-        );
-
         const sellerName = await this.etherService.getDomain(listing.maker);
-
         const item: Item = await this.dataStoreService.getItemByContract(
           tokenId,
           c.tokenContract,
@@ -255,18 +266,15 @@ export class ForgottenMarketService extends MarketService {
 
         this._logger.debug(item);
 
-        let name = item.name;
-
         // Runiverse Items hack
         if (
-          name?.startsWith('Bronze Quantum Gift') ||
-          name?.startsWith('Silver Quantum Gift')
+          item.name?.startsWith('Bronze Quantum Gift') ||
+          item.name?.startsWith('Silver Quantum Gift')
         ) {
           continue;
         }
 
-        name = name?.replace(/\(Item ID:.*\)$/, '');
-
+        const name = this.getName(item.name);
         const thumbnail = `${c.imageURI}/${tokenId}.png`;
 
         this._logger.log(`Listing: ${JSON.stringify(listing)}`);
@@ -276,7 +284,7 @@ export class ForgottenMarketService extends MarketService {
         );
 
         try {
-          listings.push({
+          const formattedListing = {
             id: tokenId,
             title: `${name} ${tokenId.length < 8 ? `(#${tokenId})` : ''}`,
             containsRoyalty,
@@ -289,10 +297,26 @@ export class ForgottenMarketService extends MarketService {
             fmLink: `https://forgotten.market/${c.tokenContract}/${tokenId}`,
             listingLink: listing.source.url,
             thumbnail,
-            backgroundColor: '#000000',
+            backgroundColor: '#000000' as const,
             market: market.name,
             marketIcon: market.icon,
-          });
+          };
+
+          const cacheResult = ((await this.cacheService.getCachedListing(
+            cacheKey,
+          )) as unknown) as Listing;
+
+          if (cacheResult) {
+            const skip = this.shouldSkipListing(cacheResult, formattedListing);
+            this.cacheService.cacheListing(cacheKey, formattedListing);
+            if (skip) {
+              continue;
+            }
+          } else {
+            this.cacheService.cacheListing(cacheKey, formattedListing);
+          }
+
+          listings.push(formattedListing);
         } catch (err) {
           this._logger.error(`${err}  ${market}`);
           this._logger.debug(market);
@@ -302,7 +326,7 @@ export class ForgottenMarketService extends MarketService {
     return listings.reverse();
   }
 
-  async getMarketMetaData(marketName: string): Promise<MarketMetaData> {
+  getMarketMetaData(marketName: string): MarketMetaData {
     switch (marketName) {
       case MarketURI.OPENSEA:
         return {
