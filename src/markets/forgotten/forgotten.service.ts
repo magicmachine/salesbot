@@ -17,6 +17,7 @@ import { CacheService } from '../../cache';
 import axios, { AxiosResponse } from 'axios';
 import { BigNumber } from 'ethers';
 
+const DAY = 24 * 60 * 60 * 1000;
 @Injectable()
 export class ForgottenMarketService extends MarketService {
   private readonly _logger = new Logger(ForgottenMarketService.name);
@@ -228,21 +229,6 @@ export class ForgottenMarketService extends MarketService {
     return name?.replace(/\(Item ID:.*\)$/, '');
   }
 
-  shouldSkipListing(cachedListing: Listing, listing: Listing): boolean {
-    let skip = false;
-    if (cachedListing != null) {
-      const previousPrice = cachedListing.tokenPrice;
-      // exclude if price diff is less than 10%
-      if (
-        listing.tokenPrice <= previousPrice &&
-        listing.tokenPrice > 0.9 * previousPrice
-      ) {
-        skip = true;
-      }
-    }
-    return skip;
-  }
-
   /**
    *  Process json into Listing[] object
    */
@@ -263,9 +249,6 @@ export class ForgottenMarketService extends MarketService {
           tokenId,
           c.tokenContract,
         );
-
-        this._logger.debug(item);
-
         // Runiverse Items hack
         if (
           item.name?.startsWith('Bronze Quantum Gift') ||
@@ -300,26 +283,41 @@ export class ForgottenMarketService extends MarketService {
             backgroundColor: '#000000' as const,
             market: market.name,
             marketIcon: market.icon,
+            expiration:
+              listing.expiration === 0
+                ? Date.now() + DAY // blur listings have no expiration
+                : listing.expiration * DAY,
           };
 
-          const cacheResult = ((await this.cacheService.getCachedListing(
+          let cacheResult = ((await this.cacheService.getCachedListing(
             cacheKey,
           )) as unknown) as Listing;
 
-          if (cacheResult) {
-            const skip = this.shouldSkipListing(cacheResult, formattedListing);
+          if (cacheResult == null) {
+            // cache & broadcast if it's empty
             this.cacheService.cacheListing(cacheKey, formattedListing);
-            if (skip) {
-              continue;
-            }
-          } else {
+            listings.push(formattedListing);
+          } else if (formattedListing.sellerAddr !== cacheResult.sellerAddr) {
+            // cache & broadcast if it's a new owner listing
             this.cacheService.cacheListing(cacheKey, formattedListing);
+            listings.push(formattedListing);
+          } else if (
+            cacheResult != null &&
+            new Date(cacheResult.expiration + DAY) < new Date(Date.now())
+          ) {
+            // cache & broadcast if the relisting happens at least a day after the expiration
+            this.cacheService.cacheListing(cacheKey, formattedListing);
+            listings.push(formattedListing);
+          } else if (
+            formattedListing.tokenPrice <
+            cacheResult.tokenPrice * 0.9
+          ) {
+            // cache & broadcast if the price is 10% lower than the previous listing
+            this.cacheService.cacheListing(cacheKey, formattedListing);
+            listings.push(formattedListing);
           }
-
-          listings.push(formattedListing);
         } catch (err) {
-          this._logger.error(`${err}  ${market}`);
-          this._logger.debug(market);
+          this._logger.error(`${err} ${JSON.stringify(market)}`);
         }
       }
     }
