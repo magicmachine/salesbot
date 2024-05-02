@@ -334,6 +334,7 @@ export interface Listing {
   cacheKey: string;
   market: string;
   marketIcon: string;
+  expiration: number;
 }
 
 export enum Market {
