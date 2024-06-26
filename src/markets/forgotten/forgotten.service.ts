@@ -68,7 +68,9 @@ export class ForgottenMarketService extends MarketService {
       }
     } catch (err) {
       this._logger.error(
-        `${err} (${collection.forgottenSlug}/Forgotten) listings`,
+        `${err} (${
+          collection.forgottenSlug
+        }/Forgotten) listings ${JSON.stringify(err?.response)}`,
       );
     } finally {
       return items.reverse();
@@ -115,7 +117,9 @@ export class ForgottenMarketService extends MarketService {
       }
     } catch (err) {
       this._logger.error(
-        `${err} (${collection.forgottenSlug}/Forgotten) sales`,
+        `${err} (${collection.forgottenSlug}/Forgotten) sales ${JSON.stringify(
+          err?.response,
+        )}`,
       );
     } finally {
       return sales.reverse();
@@ -134,11 +138,17 @@ export class ForgottenMarketService extends MarketService {
       const market: MarketMetaData = await this.getMarketMetaData(
         sale.fillSource,
       );
+
       const cacheKey = `${sale.txHash}:${sale.token.tokenId}`;
+
+      // console.log(sale);
+      this._logger.log(`Processing sale with cache key: ${cacheKey}`);
+
       const time = Date.now() / 1000 - sale.timestamp;
       if (time < this.configService.bot.salesLookbackSeconds) {
         // check if sale already in broadcast
         if (await this.cacheService.isCached(cacheKey)) {
+          this._logger.warn(`Sale already cached, skipping: ${cacheKey}`);
           continue;
         }
 
@@ -151,14 +161,19 @@ export class ForgottenMarketService extends MarketService {
         if (!name) {
           this._logger.log(`No name  in sale data, fetching individually`);
 
-          const item: Item = await this.dataStoreService.getItemByContract(
-            sale.token.tokenId,
-            c.tokenContract,
-          );
+          try {
+            const item: Item = await this.dataStoreService.getItemByContract(
+              sale.token.tokenId,
+              c.tokenContract,
+            );
+            this._logger.debug(item);
 
-          this._logger.debug(item);
-
-          name = item.name;
+            name = item.name;
+          } catch (err) {
+            this._logger.error(
+              `Error fetching NFT data for ${c.tokenContract}:${sale.token.tokenId}. ${err}`,
+            );
+          }
         }
 
         // Ruinverse Items hack

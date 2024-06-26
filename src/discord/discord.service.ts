@@ -158,6 +158,8 @@ export class DiscordService {
     for (const channel of this._salesChannels) {
       try {
         await channel.send({ embeds: [embed] });
+        // wait to avoid rate limiting ?
+        await this.sleep(200);
       } catch (err) {
         this._logger.error(err);
       }

@@ -52,8 +52,15 @@ export class EthereumService {
   }
 
   public async getDomain(address: string): Promise<string> {
-    const domain = await this.provider.lookupAddress(utils.getAddress(address));
-    this._logger.debug(`${address} resolves to ${domain}`);
-    return domain != null ? domain : ``;
+    try {
+      const domain = await this.provider.lookupAddress(
+        utils.getAddress(address),
+      );
+      this._logger.debug(`${address} resolves to ${domain}`);
+      return domain != null ? domain : address;
+    } catch (err) {
+      this._logger.error(err);
+      return address;
+    }
   }
 }
