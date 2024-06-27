@@ -94,6 +94,7 @@ export default (): AppConfig => ({
   },
   rings: {
     tokenContract: '0x5d4aa6ff9de7963ead5a17b454dc1093ca9e98e7',
+    dataURI: 'https://api.runiverse.world/GetRingInfo?RingId=',
     forgottenSlug: 'forgottenruniversewatchersrings',
   },
   runiverseitems: {
