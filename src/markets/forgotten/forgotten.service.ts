@@ -275,7 +275,7 @@ export class ForgottenMarketService extends MarketService {
         const name = this.getName(item.name);
         const thumbnail = `${c.imageURI}/${tokenId}.png`;
 
-        this._logger.log(`Listing: ${JSON.stringify(listing)}`);
+        // this._logger.log(`Listing: ${JSON.stringify(listing)}`);
 
         const containsRoyalty = listing.feeBreakdown.some(
           (fee: any) => fee.kind === 'royalty' && fee.bps > 0,
