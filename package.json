@@ -36,7 +36,7 @@
     "axios": "^0.25.0",
     "cron": "^3.1.6",
     "cross-fetch": "^3.1.4",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.3",
     "ethers": "^5.0.2",
     "graphql": "^15.5.1",
     "moment": "^2.27.0",
