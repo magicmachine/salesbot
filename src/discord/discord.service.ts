@@ -158,8 +158,6 @@ export class DiscordService {
     for (const channel of this._salesChannels) {
       try {
         await channel.send({ embeds: [embed] });
-        // wait to avoid rate limiting ?
-        await this.sleep(200);
       } catch (err) {
         this._logger.error(err);
       }
@@ -172,20 +170,31 @@ export class DiscordService {
 
   public async postSales(sales: Sale[]): Promise<void> {
     for (const sale of sales) {
-      const embed = new EmbedBuilder()
-        .setColor(sale.backgroundColor)
-        .setTitle(sale.title)
-        .setURL(sale.permalink)
-        .setThumbnail(sale.thumbnail)
-        .addFields(this.getSaleFields(sale))
-        .setFooter({ text: sale.market, iconURL: sale.marketIcon });
+      try {
+        const embed = new EmbedBuilder()
+          .setColor(sale.backgroundColor)
+          .setTitle(sale.title)
+          .setURL(sale.permalink)
+          .setThumbnail(sale.thumbnail)
+          .addFields(this.getSaleFields(sale))
+          .setFooter({ text: sale.market, iconURL: sale.marketIcon });
 
-      if (await this.cacheService.isCached(sale.cacheKey)) {
-        break;
-      } else {
-        await this.cacheService.cacheSale(sale.cacheKey);
+        this._logger.log(`Posting sale to discord: ${sale.cacheKey}`);
+
+        if (await this.cacheService.isCached(sale.cacheKey)) {
+          this._logger.log(`Sale already posted to discord ${sale.cacheKey}`);
+          break;
+        } else {
+          await this.cacheService.cacheSale(sale.cacheKey);
+        }
+
+        await this.postSale(embed);
+      } catch (error) {
+        this._logger.error(`Error posting sale to discord ${sale.cacheKey}`);
       }
-      await this.postSale(embed);
+
+      // wait to avoid rate limiting ?
+      await this.sleep(300);
     }
   }
 
