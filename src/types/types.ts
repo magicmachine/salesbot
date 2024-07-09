@@ -366,7 +366,7 @@ export enum MarketURI {
   OPENSEAPRO = 'pro.opensea.io',
   LOOKSRARE = 'looksrare.org',
   NFTX = 'nftx.io',
-  FORGOTTEN = 'forgotten.market',
+  FORGOTTEN = 'marketplace.forgottenrunes.com',
   BLUR = 'blur.io',
   GEM = 'gem.xyz',
   ZAAR = 'zaar.market',
