@@ -45,6 +45,17 @@ export class ForgottenMarketService extends MarketService {
         `Checking for listings ${collection.forgottenSlug}/Forgotten`,
       );
 
+      const headers = {
+        Accept: 'application/json',
+      };
+
+      if (this.configService.bot.reservoirApiKey) {
+        headers['x-api-key'] = this.configService.bot.reservoirApiKey;
+      } else {
+        this._logger.warn(`No API key set for Reservoir, using demo key`);
+        headers['x-api-key'] = 'demo-api-key';
+      }
+
       // https://forgotten.market/api/orders/asks/v5?tokenSetId=contract:0x9690b63eb85467be5267a3603f770589ab12dc95
       const response: AxiosResponse = await axios.get(
         `${
@@ -54,7 +65,7 @@ export class ForgottenMarketService extends MarketService {
         }?tokenSetId=contract:${collection.tokenContract}`,
         {
           method: 'get',
-
+          headers,
           timeout: 10000,
         },
       );
@@ -91,7 +102,10 @@ export class ForgottenMarketService extends MarketService {
         Accept: 'application/json',
       };
 
-      if (collection.chain === 'arbitrum') {
+      if (this.configService.bot.reservoirApiKey) {
+        headers['x-api-key'] = this.configService.bot.reservoirApiKey;
+      } else {
+        this._logger.warn(`No API key set for Reservoir, using demo key`);
         headers['x-api-key'] = 'demo-api-key';
       }
 
@@ -103,7 +117,7 @@ export class ForgottenMarketService extends MarketService {
         }?includeTokenMetadata=true&collection=${collection.tokenContract}`,
         {
           method: 'get',
-
+          headers,
           timeout: 10000,
         },
       );

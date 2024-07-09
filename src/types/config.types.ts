@@ -33,6 +33,7 @@ export interface BotConfig {
   reservoirSalesApiArbitrum: string;
   reservoirAsksApiMainnet: string;
   reservoirAsksApiArbitrum: string;
+  reservoirApiKey: string;
   redisUri: string;
   forgottenBaseURI: string;
 }

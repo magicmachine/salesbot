@@ -5,12 +5,13 @@ export default (): AppConfig => ({
     salesCheckCron: process.env.SALES_CHECK_CRON || '*/1 * * * *',
     salesLookbackSeconds: Number(process.env.SALES_LOOKBACK) || 900,
     redisUri: process.env.REDIS_URL || 'redis://localhost:6379',
-    reservoirSalesApiMainnet: 'https://forgotten.market/api/sales/v6',
-    reservoirSalesApiArbitrum: 'https://api-arbitrum.reservoir.tools/sales/v6', // TODO: switch to our paid version?
-    reservoirAsksApiMainnet: 'https://forgotten.market/api/orders/asks/v5',
+    reservoirSalesApiMainnet: 'https://api.reservoir.tools/sales/v6',
+    reservoirSalesApiArbitrum: 'https://api-arbitrum.reservoir.tools/sales/v6',
+    reservoirApiKey: process.env.RESERVOIR_API_KEY,
+    reservoirAsksApiMainnet: 'https://api.reservoir.tools/api/orders/asks/v5',
     reservoirAsksApiArbitrum:
       'https://api-arbitrum.reservoir.tools/orders/asks/v5',
-    forgottenBaseURI: 'https://forgotten.market',
+    forgottenBaseURI: 'https://marketplace.forgottenrunes.com',
   },
   wizard: {
     tokenContract: '0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42',
