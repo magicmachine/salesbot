@@ -249,6 +249,11 @@ export class ForgottenMarketService extends MarketService {
           this._logger.error(`${err}  ${market}`);
           this._logger.debug(market);
         }
+      } else {
+        this._logger.warn(
+          `Sale too old to broadcast: ${cacheKey} ${time}s`,
+        );
+      
       }
     }
     return sales.reverse();
