@@ -220,14 +220,14 @@ export class DiscordService {
         name: 'Buyer',
         value: `[${sale.buyerAddr.slice(0, -34)}](${
           this.configService.bot.forgottenBaseURI
-        }/address/${sale.buyerAddr}) ${sale.buyerName}`,
+        }/portfolio/${sale.buyerAddr}) ${sale.buyerName}`,
         inline: true,
       },
       {
         name: 'Seller',
         value: `[${sale.sellerAddr.slice(0, -34)}](${
           this.configService.bot.forgottenBaseURI
-        }/address/${sale.sellerAddr}) ${sale.sellerName}`,
+        }/portfolio/${sale.sellerAddr}) ${sale.sellerName}`,
         inline: true,
       },
     ];
@@ -246,7 +246,7 @@ export class DiscordService {
         name: 'From',
         value: `[${listing.sellerAddr.slice(0, -34)}](${
           this.configService.bot.forgottenBaseURI
-        }/address/${listing.sellerAddr}) ${listing.sellerName}`,
+        }/portfolio/${listing.sellerAddr}) ${listing.sellerName}`,
         inline: true,
       },
     ];
