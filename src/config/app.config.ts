@@ -8,7 +8,7 @@ export default (): AppConfig => ({
     reservoirSalesApiMainnet: 'https://api.reservoir.tools/sales/v6',
     reservoirSalesApiArbitrum: 'https://api-arbitrum.reservoir.tools/sales/v6',
     reservoirApiKey: process.env.RESERVOIR_API_KEY,
-    reservoirAsksApiMainnet: 'https://api.reservoir.tools/api/orders/asks/v5',
+    reservoirAsksApiMainnet: 'https://api.reservoir.tools/orders/asks/v5',
     reservoirAsksApiArbitrum:
       'https://api-arbitrum.reservoir.tools/orders/asks/v5',
     forgottenBaseURI: 'https://marketplace.forgottenrunes.com',
