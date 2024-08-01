@@ -118,7 +118,7 @@ export class DiscordService {
             name: 'From',
             value: `[${listings[0].sellerAddr.slice(0, -34)}](${
               this.configService.bot.forgottenBaseURI
-            }/address/${listings[0].sellerAddr}) ${listings[0].sellerName}`,
+            }/portfolio/${listings[0].sellerAddr}) ${listings[0].sellerName}`,
             inline: false,
           },
           ...marketFields,
