@@ -107,11 +107,17 @@ export class DiscordService {
         })
         .flat();
 
+      const thumbnailUrl = tokenListings[0].fmLink.includes(
+        '0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42',
+      )
+        ? `https://www.forgottenrunes.com/api/art/wizards/${tokenListings[0].id}/default.png`
+        : tokenListings[0].thumbnail;
+
       const embed: APIEmbed = {
         title: `${tokenListings[0].title}`,
         url: tokenListings[0].fmLink,
         thumbnail: {
-          url: tokenListings[0].thumbnail,
+          url: thumbnailUrl,
         },
         fields: [
           {
