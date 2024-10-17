@@ -14,7 +14,10 @@ export class CacheService {
   }
 
   constructor(protected readonly configService: AppConfigService) {
-    this._cache = createClient({ url: this.configService.bot.redisUri });
+    this._cache = createClient({ url: this.configService.bot.redisUri, socket: {
+    tls: (this.configService.bot.redisUri.match(/rediss:/) != null),
+    rejectUnauthorized: false,
+  } });
     this._cache.on('error', err => console.log('Redis Client Error', err));
     this._cache.connect();
   }
