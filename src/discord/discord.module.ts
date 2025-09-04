@@ -4,6 +4,7 @@ import { AppConfigModule } from '../config';
 import { DataStoreModule } from '../datastore';
 import { EthereumModule } from '../ethereum';
 import { ForgottenMarketModule } from '../markets';
+import { TwitterModule } from '../twitter';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ForgottenMarketModule } from '../markets';
     DataStoreModule,
     EthereumModule,
     ForgottenMarketModule,
+    TwitterModule,
   ],
   providers: [DiscordService],
   exports: [DiscordService],

@@ -14,6 +14,7 @@ import { CollectionConfig, Wizard, Sale, Item, Listing } from '../types';
 import { ForgottenMarketService } from '../markets';
 import { DataStoreService } from '../datastore';
 import { CacheService } from '../cache';
+import { TwitterService } from '../twitter';
 
 @Injectable()
 export class DiscordService {
@@ -37,6 +38,7 @@ export class DiscordService {
     protected readonly dataStoreService: DataStoreService,
     protected readonly cacheService: CacheService,
     protected readonly forgottenMarket: ForgottenMarketService,
+    protected readonly twitterService: TwitterService,
   ) {
     const { token, salesChannelIds } = this.configService.discord;
     this._client.login(token);
@@ -195,6 +197,13 @@ export class DiscordService {
         }
 
         await this.postSale(embed);
+        
+        // Also post to Twitter
+        try {
+          await this.twitterService.postSale(sale);
+        } catch (twitterError) {
+          this._logger.error(`Error posting sale to Twitter ${sale.cacheKey}: ${twitterError}`);
+        }
       } catch (error) {
         this._logger.error(`Error posting sale to discord ${sale.cacheKey}`);
       }
