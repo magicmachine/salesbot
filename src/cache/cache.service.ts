@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from '../config';
 import { createClient } from 'redis';
-import { RedisClientType } from '@node-redis/client';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class CacheService {

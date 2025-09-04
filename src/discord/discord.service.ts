@@ -6,12 +6,8 @@ import toRegexRange from 'to-regex-range';
 import { CollectionConfig, Wizard, Sale, Item } from 'src/types';
 import { ForgottenMarketService } from 'src/markets';
 import { DataStoreService } from '../datastore';
-<<<<<<< Updated upstream
-import { CacheService } from 'src/cache';
-=======
 import { TwitterService } from '../twitter';
 import { CacheService } from '../cache';
->>>>>>> Stashed changes
 
 @Injectable()
 export class DiscordService {
@@ -76,25 +72,20 @@ export class DiscordService {
 
   public async postSales(sales: Sale[]): Promise<void> {
     for (const sale of sales) {
-      const embed = new MessageEmbed()
-        .setColor(sale.backgroundColor)
-        .setTitle(sale.title)
-        .setURL(sale.permalink)
-        .setThumbnail(sale.thumbnail)
-        .addFields(this.getStandardFields(sale))
-        .setFooter(sale.market, sale.marketIcon);
+      try {
+        const embed = new MessageEmbed()
+          .setColor(sale.backgroundColor)
+          .setTitle(sale.title)
+          .setURL(sale.permalink)
+          .setThumbnail(sale.thumbnail)
+          .addFields(this.getSaleFields(sale))
+          .setFooter(sale.market, sale.marketIcon);
 
-<<<<<<< Updated upstream
-      if (await this.cacheService.isCached(sale.cacheKey)) {
-        break;
-      } else {
-        await this.cacheService.cacheSale(sale.cacheKey);
-=======
         this._logger.log(`Posting sale to discord: ${sale.cacheKey}`);
 
         if (await this.cacheService.isCached(sale.cacheKey)) {
           this._logger.log(`Sale already posted to discord ${sale.cacheKey}`);
-          break;
+          continue;
         } else {
           await this.cacheService.cacheSale(sale.cacheKey);
         }
@@ -110,9 +101,10 @@ export class DiscordService {
         }
       } catch (error) {
         this._logger.error(`Error posting sale to discord ${sale.cacheKey}`);
->>>>>>> Stashed changes
       }
-      await this.postSale(embed);
+      
+      // wait to avoid rate limiting
+      await this.sleep(300);
     }
   }
 
@@ -120,7 +112,7 @@ export class DiscordService {
    * get standard fields for each sale
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public getStandardFields(sale: Sale): any[] {
+  public getSaleFields(sale: Sale): any[] {
     return [
       {
         name: 'Amount',

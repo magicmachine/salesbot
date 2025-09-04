@@ -5,12 +5,9 @@
   "author": "ajcrowe",
   "private": true,
   "license": "MIT",
-<<<<<<< Updated upstream
-=======
   "engines": {
     "node": ">=18.0.0"
   },
->>>>>>> Stashed changes
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

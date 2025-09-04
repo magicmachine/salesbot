@@ -42,7 +42,6 @@ export class TwitterController {
       backgroundColor: '#000000',
       market: 'OpenSea',
       marketIcon: 'https://raw.githubusercontent.com/ajcrowe/runebot/master/assets/os.png',
-      creatorRoyalties: '5',
       ...saleData,
     };
 
