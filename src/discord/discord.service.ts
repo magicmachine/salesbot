@@ -6,7 +6,12 @@ import toRegexRange from 'to-regex-range';
 import { CollectionConfig, Wizard, Sale, Item } from 'src/types';
 import { ForgottenMarketService } from 'src/markets';
 import { DataStoreService } from '../datastore';
+<<<<<<< Updated upstream
 import { CacheService } from 'src/cache';
+=======
+import { TwitterService } from '../twitter';
+import { CacheService } from '../cache';
+>>>>>>> Stashed changes
 
 @Injectable()
 export class DiscordService {
@@ -27,6 +32,7 @@ export class DiscordService {
     protected readonly dataStoreService: DataStoreService,
     protected readonly cacheService: CacheService,
     protected readonly forgottenMarket: ForgottenMarketService,
+    protected readonly twitterService: TwitterService,
   ) {
     const { token, salesChannelIds } = this.configService.discord;
     this._client.login(token);
@@ -78,10 +84,33 @@ export class DiscordService {
         .addFields(this.getStandardFields(sale))
         .setFooter(sale.market, sale.marketIcon);
 
+<<<<<<< Updated upstream
       if (await this.cacheService.isCached(sale.cacheKey)) {
         break;
       } else {
         await this.cacheService.cacheSale(sale.cacheKey);
+=======
+        this._logger.log(`Posting sale to discord: ${sale.cacheKey}`);
+
+        if (await this.cacheService.isCached(sale.cacheKey)) {
+          this._logger.log(`Sale already posted to discord ${sale.cacheKey}`);
+          break;
+        } else {
+          await this.cacheService.cacheSale(sale.cacheKey);
+        }
+
+        await this.postSale(embed);
+        
+        // Post to Twitter
+        try {
+          await this.twitterService.tweetSale(sale);
+          this._logger.log(`Posted sale to Twitter: ${sale.title}`);
+        } catch (twitterError) {
+          this._logger.error(`Error posting sale to Twitter: ${sale.title}`, twitterError);
+        }
+      } catch (error) {
+        this._logger.error(`Error posting sale to discord ${sale.cacheKey}`);
+>>>>>>> Stashed changes
       }
       await this.postSale(embed);
     }

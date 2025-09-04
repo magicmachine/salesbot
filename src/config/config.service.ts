@@ -7,7 +7,7 @@ import {
   TwitterConfig,
   CollectionConfig,
 } from '../types';
-import { TwitterOptions } from 'twitter-lite';
+// TwitterOptions interface removed - using direct config
 
 @Injectable()
 export class AppConfigService {
@@ -100,14 +100,8 @@ export class AppConfigService {
   /**
    * Twitter config
    */
-  public get twitter(): TwitterOptions {
-    const config = this.configService.get<TwitterConfig>('twitter');
-    return {
-      consumer_key: config.consumerKey,
-      consumer_secret: config.consumerSecret,
-      access_token_key: config.accessTokenKey,
-      access_token_secret: config.accessTokenSecret,
-    };
+  public get twitter(): TwitterConfig {
+    return this.configService.get<TwitterConfig>('twitter');
   }
 
   /**
