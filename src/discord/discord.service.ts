@@ -109,6 +109,31 @@ export class DiscordService {
         })
         .flat();
 
+      // Extract contract address from the Forgotten Runes link
+      let contractAddress = '';
+      if (tokenListings[0].fmLink && tokenListings[0].fmLink.includes('/asset/')) {
+        // Format: https://marketplace.forgottenrunes.com/ethereum/asset/0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42:1234
+        const assetPart = tokenListings[0].fmLink.split('/asset/')[1];
+        if (assetPart && assetPart.includes(':')) {
+          contractAddress = assetPart.split(':')[0];
+        }
+      }
+
+      // Add OpenSea link field if we have the contract address
+      if (contractAddress && tokenListings[0].id) {
+        marketFields.push(
+          {
+            name: '\u000A',
+            value: '\u000A',
+          },
+          {
+            name: 'View on OpenSea',
+            value: `[OpenSea](https://opensea.io/assets/ethereum/${contractAddress}/${tokenListings[0].id})`,
+            inline: false,
+          }
+        );
+      }
+
       const thumbnailUrl = tokenListings[0].fmLink.includes(
         '0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42',
       )
@@ -218,7 +243,17 @@ export class DiscordService {
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public getSaleFields(sale: Sale): any[] {
-    return [
+    // Extract contract address from the Forgotten Runes permalink
+    let contractAddress = '';
+    if (sale.permalink && sale.permalink.includes('/asset/')) {
+      // Format: https://marketplace.forgottenrunes.com/ethereum/asset/0x521f9c7505005cfa19a8e5786a9c3c9c9f5e6f42:1234
+      const assetPart = sale.permalink.split('/asset/')[1];
+      if (assetPart && assetPart.includes(':')) {
+        contractAddress = assetPart.split(':')[0];
+      }
+    }
+
+    const fields = [
       {
         name: 'Amount',
         value: `${parseFloat(sale.tokenPrice.toFixed(4))} ${sale.tokenSymbol} ${
@@ -246,6 +281,17 @@ export class DiscordService {
         inline: true,
       },
     ];
+
+    // Add OpenSea link if we have the contract address
+    if (contractAddress && sale.id) {
+      fields.push({
+        name: 'View on OpenSea',
+        value: `[OpenSea](https://opensea.io/assets/ethereum/${contractAddress}/${sale.id})`,
+        inline: false,
+      });
+    }
+
+    return fields;
   }
 
   public getListingFields(listing: Listing): APIEmbedField[] {
