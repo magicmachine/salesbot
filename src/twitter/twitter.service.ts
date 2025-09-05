@@ -3,6 +3,7 @@ import { TwitterApi } from 'twitter-api-v2';
 import { AppConfigService } from '../config';
 import { DailyTweet, Sale } from '../types';
 import { CacheService } from '../cache';
+import axios from 'axios';
 
 @Injectable()
 export class TwitterService {
@@ -27,7 +28,7 @@ export class TwitterService {
   }
 
   /**
-   * Post a sale to Twitter
+   * Post a sale to Twitter with image
    * @param sale Sale object containing transaction details
    */
   public async postSale(sale: Sale): Promise<void> {
@@ -46,7 +47,53 @@ export class TwitterService {
 
       if (!this.configService.isDevelopment) {
         try {
-          const tweet = await this.twitterClient.v2.tweet(status);
+          let mediaId: string | undefined;
+          
+          // Download and upload image if available
+          if (sale.thumbnail) {
+            try {
+              this._logger.log(`Downloading image from: ${sale.thumbnail}`);
+              
+              // Download image
+              const imageResponse = await axios.get(sale.thumbnail, {
+                responseType: 'arraybuffer'
+              });
+              
+              // Convert to Buffer
+              const imageBuffer = Buffer.from(imageResponse.data);
+              
+              // Upload to Twitter
+              this._logger.log(`Uploading image to Twitter...`);
+              
+              // Determine MIME type based on URL or content
+              let mimeType = 'image/png';
+              if (sale.thumbnail.toLowerCase().includes('.jpg') || sale.thumbnail.toLowerCase().includes('.jpeg')) {
+                mimeType = 'image/jpeg';
+              } else if (sale.thumbnail.toLowerCase().includes('.gif')) {
+                mimeType = 'image/gif';
+              } else if (sale.thumbnail.toLowerCase().includes('.webp')) {
+                mimeType = 'image/webp';
+              }
+              
+              mediaId = await this.twitterClient.v1.uploadMedia(imageBuffer, {
+                mimeType,
+                target: 'tweet',
+              });
+              
+              this._logger.log(`Image uploaded successfully, media ID: ${mediaId}`);
+            } catch (imageError) {
+              this._logger.error(`Error uploading image: ${imageError}`);
+              // Continue without image if upload fails
+            }
+          }
+          
+          // Post tweet with or without media
+          const tweetData: any = { text: status };
+          if (mediaId) {
+            tweetData.media = { media_ids: [mediaId] };
+          }
+          
+          const tweet = await this.twitterClient.v2.tweet(tweetData);
           this._logger.log(`Successfully tweeted: ${tweet.data.id} - ${status}`);
           
           // Cache to prevent duplicate posts
@@ -56,6 +103,9 @@ export class TwitterService {
         }
       } else {
         this._logger.log(`[DEV MODE] Would tweet: ${status}`);
+        if (sale.thumbnail) {
+          this._logger.log(`[DEV MODE] Would include image: ${sale.thumbnail}`);
+        }
         // Still cache in dev mode to prevent spam in logs
         await this.cacheService.cacheSale(twitterCacheKey);
       }
