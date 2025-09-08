@@ -223,9 +223,17 @@ export class DiscordService {
 
         await this.postSale(embed);
         
-        // Also post to Twitter
+        // Also post to Twitter if sale price is >= $500
         try {
-          await this.twitterService.postSale(sale);
+          // Extract USD price from string format "(74.31 USD)"
+          const usdPriceMatch = sale.usdPrice?.match(/\(([\d,]+\.?\d*)\s*USD\)/);
+          const usdPriceValue = usdPriceMatch ? parseFloat(usdPriceMatch[1].replace(/,/g, '')) : 0;
+          
+          if (usdPriceValue >= 500) {
+            await this.twitterService.postSale(sale);
+          } else {
+            this._logger.log(`Sale ${sale.cacheKey} below $500 threshold ($${usdPriceValue}), skipping Twitter post`);
+          }
         } catch (twitterError) {
           this._logger.error(`Error posting sale to Twitter ${sale.cacheKey}: ${twitterError}`);
         }
